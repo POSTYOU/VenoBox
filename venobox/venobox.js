@@ -4,6 +4,7 @@
  * @requires jQuery
  *
  * Examples at http://lab.veno.it/venobox/
+
  * License: MIT License
  * License URI: https://github.com/nicolafranchini/VenoBox/blob/master/LICENSE
  * Copyright 2013-2015 Nicola Franchini - @nicolafranchini
@@ -11,11 +12,15 @@
  */
 (function($){
 
+
+
+
+
     var bgcolor, blocknum, blocktitle, border, core, container, content, dest, 
         evitacontent, evitanext, evitaprev, extraCss, figliall, framewidth, frameheight, 
         infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay, 
         prima, title, thisgall, thenext, theprev, type, 
-        finH, sonH, nextok, prevok;
+        finH, sonH, nextok, prevok,callback;
 
     $.fn.extend({
         //plugin name - venobox
@@ -31,6 +36,7 @@
               numeratio: false,
               infinigall: false,
               overlayclose: true // disable overlay click-close - thanx @martybalandis 
+              callback: undefined
           };
 
           var option = $.extend(defaults, options);
@@ -51,7 +57,13 @@
                   obj.data('numeratio', option.numeratio);
                   obj.data('infinigall', option.infinigall);
                   obj.data('overlayclose', option.overlayclose);
+                  obj.data('callback', option.callback);
                   obj.data('venobox', true);
+
+
+
+
+
 
                   obj.click(function(e){
                     e.stopPropagation();
@@ -61,12 +73,18 @@
                     framewidth = obj.data('framewidth');
                     frameheight = obj.data('frameheight');
                     border = obj.data('border');
+                    callback = obj.data('callback');
                     bgcolor = obj.data('bgcolor');
                     nextok = false;
                     prevok = false;
                     keyNavigationDisabled = false;
                     dest = obj.attr('href');
+
+
                     extraCss = obj.data( 'css' ) || "";
+
+
+
 
                     $('body').addClass('vbox-open');
                     core = '<div class="vbox-overlay ' + extraCss + '" style="background:'+ overlayColor +'"><div class="vbox-preloader">Loading...</div><div class="vbox-container"><div class="vbox-content"></div></div><div class="vbox-title"></div><div class="vbox-num">0/0</div><div class="vbox-close">X</div><div class="vbox-next">next</div><div class="vbox-prev">prev</div></div>';
@@ -86,22 +104,78 @@
 
                     overlay.css('min-height', $(window).outerHeight());
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     // fade in overlay
                     overlay.animate({opacity:1}, 250, function(){
     
                       if(obj.data('type') == 'iframe'){
+
                         loadIframe();
                       }else if (obj.data('type') == 'inline'){
+
                         loadInline();
                       }else if (obj.data('type') == 'ajax'){
+
                         loadAjax();
                       }else if (obj.data('type') == 'vimeo'){
+
                         loadVimeo();
                       }else if (obj.data('type') == 'youtube'){
                         loadYoutube();
+
                       } else {
                         content.html('<img src="'+dest+'">');
                         preloadFirst();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                       }
                     });
 
@@ -116,8 +190,10 @@
 
                       if(items.length > 0 && numeratio === true){
                         blocknum.html(items.index(obj)+1 + ' / ' + items.length);
+
                         blocknum.show();
                       }else{
+
                         blocknum.hide();
                       }
 
@@ -126,9 +202,11 @@
 
                       if(obj.attr(option.titleattr)){
                         title = obj.attr(option.titleattr);
+
                         blocktitle.show();
                       }else{
                         title = '';
+
                         blocktitle.hide();
                       }
 
@@ -168,6 +246,7 @@
                       
                       prev: function() {
 
+
                         if (keyNavigationDisabled) {
                           return;
                         } else {
@@ -192,6 +271,8 @@
                         if (overlayColor === undefined ) {
                           overlayColor = "";
                         }
+
+
 
                         content.animate({ opacity:0}, 500, function(){
                           
@@ -220,6 +301,7 @@
 
                       next: function() {
                         
+
                         if (keyNavigationDisabled) {
                           return;
                         } else {
@@ -232,6 +314,8 @@
                         frameheight = thenext.data('frameheight');
                         border = thenext.data('border');
                         bgcolor = thenext.data('bgcolor');
+
+
                         dest = thenext.attr('href');
 
                         if(thenext.attr(option.titleattr)){
@@ -243,6 +327,8 @@
                         if (overlayColor === undefined ) {
                           overlayColor = "";
                         }
+
+
 
                         content.animate({ opacity:0}, 500, function(){
                           
@@ -308,11 +394,42 @@
                       $('body').removeClass('vbox-open');
                       $('body').unbind('keydown', escapeHandler);
 
+
+
                         overlay.animate({opacity:0}, 500, function(){
                           overlay.remove();
+
+
                           keyNavigationDisabled = false;
                           obj.focus();
                         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     }
 
                     /* -------- CLOSE CLICK -------- */
@@ -337,10 +454,26 @@
         }
     });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /* -------- LOAD AJAX -------- */
     function loadAjax(){
       $.ajax({
       url: dest,
+
+
       cache: false
       }).done(function( msg ) {
           content.html('<div class="vbox-inline">'+ msg +'</div>');
@@ -349,6 +482,7 @@
       }).fail(function() {
           content.html('<div class="vbox-inline"><p>Error retrieving contents, please retry</div>');
           updateoverlay(true);
+
       })
     }
 
@@ -364,7 +498,7 @@
     function loadVimeo(){
       var pezzi = dest.split('/');
       var videoid = pezzi[pezzi.length-1];
-      content.html('<iframe width="500" height="281" class="venoframe" webkitallowfullscreen mozallowfullscreen allowfullscreen frameborder="0" src="https://player.vimeo.com/video/'+videoid+'"></iframe>');
+      content.html('<iframe class="venoframe" src="//player.vimeo.com/video/'+videoid+'"></iframe>');
       updateoverlay();
     }
 
@@ -395,6 +529,10 @@
     /* -------- CENTER ON LOAD -------- */
     function updateoverlay(){
 
+
+
+
+
       blocktitle.html(title);
       content.find(">:first-child").addClass('figlio');
       $('.figlio').css('width', framewidth).css('height', frameheight).css('padding', border).css('background', bgcolor);
@@ -411,6 +549,11 @@
         content.css('margin-top', '40px');
         content.css('margin-bottom', '40px');
       }
+        if(typeof callback  != 'undefined' && $.isFunction(callback))
+      content.animate({
+        'opacity': '1'
+      },'slow',callback);
+      else
       content.animate({
         'opacity': '1'
       },'slow');
