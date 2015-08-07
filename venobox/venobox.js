@@ -35,7 +35,7 @@
               titleattr: 'title', // specific attribute to get a title (e.g. [data-title]) - thanx @mendezcode
               numeratio: false,
               infinigall: false,
-              overlayclose: true // disable overlay click-close - thanx @martybalandis 
+              overlayclose: true, // disable overlay click-close - thanx @martybalandis 
               callback: undefined
           };
 
