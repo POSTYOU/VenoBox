@@ -4,7 +4,6 @@
  * @requires jQuery
  *
  * Examples at http://lab.veno.it/venobox/
-
  * License: MIT License
  * License URI: https://github.com/nicolafranchini/VenoBox/blob/master/LICENSE
  * Copyright 2013-2015 Nicola Franchini - @nicolafranchini
@@ -16,58 +15,57 @@
 
 
 
-    var bgcolor, blocknum, blocktitle, border, core, container, content, dest,vwrap, ios,
-        evitacontent, evitanext, evitaprev, extraCss, figliall, framewidth, frameheight, 
-        infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay, 
-        prima, title, thisgall, thenext, theprev, type, 
+    var ios,ie9,bgcolor, blocknum, blocktitle, border, core, container, content, dest,
+        evitacontent, evitanext, evitaprev, extraCss, figliall, framewidth, frameheight,
+        infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay,top,
+        prima, title, thisgall, thenext, theprev, type,
         finH, sonH, nextok, prevok,callback;
 
     $.fn.extend({
-        
-        ios = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
         //plugin name - venobox
         venobox: function(options) {
 
-          // default option
-          var defaults = {
-              framewidth: '',
-              frameheight: '',
-              border: '0',
-              bgcolor: '#fff',
-              titleattr: 'title', // specific attribute to get a title (e.g. [data-title]) - thanx @mendezcode
-              numeratio: false,
-              infinigall: false,
-              overlayclose: true, // disable overlay click-close - thanx @martybalandis 
-              callback: undefined
-          };
+            // default option
+            var defaults = {
+                framewidth: '',
+                frameheight: '',
+                border: '0',
+                bgcolor: '#fff',
+                titleattr: 'title', // specific attribute to get a title (e.g. [data-title]) - thanx @mendezcode
+                numeratio: false,
+                infinigall: false,
+                overlayclose: true, // disable overlay click-close - thanx @martybalandis
+                callback: undefined
+            };
 
-          var option = $.extend(defaults, options);
+            var option = $.extend(defaults, options);
 
             return this.each(function() {
-                  var obj = $(this);
+                var obj = $(this);
 
-                  // Prevent double initialization - thanx @matthistuff
-                  if(obj.data('venobox')) {
+                // Prevent double initialization - thanx @matthistuff
+                if(obj.data('venobox')) {
                     return true;
-                  }
+                }
 
-                  obj.addClass('vbox-item');
-                  obj.data('framewidth', option.framewidth);
-                  obj.data('frameheight', option.frameheight);
-                  obj.data('border', option.border);
-                  obj.data('bgcolor', option.bgcolor);
-                  obj.data('numeratio', option.numeratio);
-                  obj.data('infinigall', option.infinigall);
-                  obj.data('overlayclose', option.overlayclose);
-                  obj.data('callback', option.callback);
-                  obj.data('venobox', true);
+                obj.addClass('vbox-item');
+                obj.data('framewidth', option.framewidth);
+                obj.data('frameheight', option.frameheight);
+                obj.data('border', option.border);
+                obj.data('bgcolor', option.bgcolor);
+                obj.data('numeratio', option.numeratio);
+                obj.data('infinigall', option.infinigall);
+                obj.data('overlayclose', option.overlayclose);
+                obj.data('callback', option.callback);
+                obj.data('venobox', true);
 
-
-
-
+                ios = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
 
-                  obj.click(function(e){
+
+
+
+                obj.click(function(e){
                     e.stopPropagation();
                     e.preventDefault();
                     obj = $(this);
@@ -81,32 +79,16 @@
                     prevok = false;
                     keyNavigationDisabled = false;
                     dest = obj.attr('href');
-
-
+                    top = $(window).scrollTop();
+                    top = -top;
                     extraCss = obj.data( 'css' ) || "";
+
                     $('body').wrapInner('<div class="vwrap"></div>');
+
                     vwrap = $('.vwrap');
-
-
-                    $('body').addClass('vbox-open');
                     core = '<div class="vbox-overlay ' + extraCss + '" style="background:'+ overlayColor +'"><div class="vbox-preloader">Loading...</div><div class="vbox-container"><div class="vbox-content"></div></div><div class="vbox-title"></div><div class="vbox-num">0/0</div><div class="vbox-close">X</div><div class="vbox-next">next</div><div class="vbox-prev">prev</div></div>';
 
                     $('body').append(core);
-                    if (ios) {
-                      vwrap.css({
-                        'position': 'fixed',
-                        'top': top,
-                        'opacity': '0'
-                      }).data('top', top);
-                    } else {
-                      vwrap.css({
-                       'position': 'fixed',
-                        'top': top
-                      }).data('top', top);
-                      $(window).scrollTop(0);
-                    }
-
-
 
                     overlay = $('.vbox-overlay');
                     container = $('.vbox-container');
@@ -121,287 +103,297 @@
 
                     overlay.css('min-height', $(window).outerHeight());
 
-
                     // fade in overlay
                     overlay.animate({opacity:1}, 250, function(){
-    
-                      if(obj.data('type') == 'iframe'){
 
-                        loadIframe();
-                      }else if (obj.data('type') == 'inline'){
+                        if(obj.data('type') == 'iframe'){
 
-                        loadInline();
-                      }else if (obj.data('type') == 'ajax'){
+                            loadIframe();
+                        }else if (obj.data('type') == 'inline'){
 
-                        loadAjax();
-                      }else if (obj.data('type') == 'vimeo'){
+                            loadInline();
+                        }else if (obj.data('type') == 'ajax'){
 
-                        loadVimeo();
-                      }else if (obj.data('type') == 'youtube'){
-                        loadYoutube();
+                            loadAjax();
+                        }else if (obj.data('type') == 'vimeo'){
 
-                      } else {
-                        content.html('<img src="'+dest+'">');
-                        preloadFirst();
+                            loadVimeo();
+                        }else if (obj.data('type') == 'youtube'){
+                            loadYoutube();
 
-            }
+                        } else {
+                            content.html('<img src="'+dest+'">');
+                            preloadFirst();
+                        }
                     });
+
+
+                    if (ios) {
+                        vwrap.css({
+                            'position': 'fixed',
+                            'top': top,
+                            'opacity': '0'
+                        }).data('top', top);
+                    } else {
+                        vwrap.css({
+                            'position': 'fixed',
+                            'top': top
+                        }).data('top', top);
+                        $(window).scrollTop(0);
+                    }
 
                     /* -------- CHECK NEXT / PREV -------- */
                     function checknav(){
 
-                      thisgall = obj.data('gall');
-                      numeratio = obj.data('numeratio');
-                      infinigall = obj.data('infinigall');
+                        thisgall = obj.data('gall');
+                        numeratio = obj.data('numeratio');
+                        infinigall = obj.data('infinigall');
 
-                      items = $('.vbox-item[data-gall="' + thisgall + '"]');
+                        items = $('.vbox-item[data-gall="' + thisgall + '"]');
 
-                      if(items.length > 0 && numeratio === true){
-                        blocknum.html(items.index(obj)+1 + ' / ' + items.length);
+                        if(items.length > 0 && numeratio === true){
+                            blocknum.html(items.index(obj)+1 + ' / ' + items.length);
 
-                        blocknum.show();
-                      }else{
-
-                        blocknum.hide();
-                      }
-
-                      thenext = items.eq( items.index(obj) + 1 );
-                      theprev = items.eq( items.index(obj) - 1 );
-
-                      if(obj.attr(option.titleattr)){
-                        title = obj.attr(option.titleattr);
-
-                        blocktitle.show();
-                      }else{
-                        title = '';
-
-                        blocktitle.hide();
-                      }
-
-                      if (items.length > 0 && infinigall === true) {
-
-                        nextok = true;
-                        prevok = true;
-
-                        if(thenext.length < 1 ){
-                          thenext = items.eq(0);
-                        }
-                        if(items.index(obj) < 1 ){
-                          theprev = items.eq( items.index(items.length) );
-                        }
-
-                      } else {
-
-                        if(thenext.length > 0 ){
-                          $('.vbox-next').css('display', 'block');
-                          nextok = true;
+                            blocknum.show();
                         }else{
-                          $('.vbox-next').css('display', 'none');
-                          nextok = false;
+
+                            blocknum.hide();
                         }
-                        if(items.index(obj) > 0 ){
-                          $('.vbox-prev').css('display', 'block');
-                          prevok = true;
+
+                        thenext = items.eq( items.index(obj) + 1 );
+                        theprev = items.eq( items.index(obj) - 1 );
+
+                        if(obj.attr(option.titleattr)){
+                            title = obj.attr(option.titleattr);
+
+                            blocktitle.show();
                         }else{
-                          $('.vbox-prev').css('display', 'none');
-                          prevok = false;
+                            title = '';
+
+                            blocktitle.hide();
                         }
-                      }
+
+                        if (items.length > 0 && infinigall === true) {
+
+                            nextok = true;
+                            prevok = true;
+
+                            if(thenext.length < 1 ){
+                                thenext = items.eq(0);
+                            }
+                            if(items.index(obj) < 1 ){
+                                theprev = items.eq( items.index(items.length) );
+                            }
+
+                        } else {
+
+                            if(thenext.length > 0 ){
+                                $('.vbox-next').css('display', 'block');
+                                nextok = true;
+                            }else{
+                                $('.vbox-next').css('display', 'none');
+                                nextok = false;
+                            }
+                            if(items.index(obj) > 0 ){
+                                $('.vbox-prev').css('display', 'block');
+                                prevok = true;
+                            }else{
+                                $('.vbox-prev').css('display', 'none');
+                                prevok = false;
+                            }
+                        }
                     }
-                    
-                     /* -------- NAVIGATION CODE -------- */
+
+                    /* -------- NAVIGATION CODE -------- */
                     var gallnav = {
-                      
-                      prev: function() {
+
+                        prev: function() {
 
 
-                        if (keyNavigationDisabled) {
-                          return;
-                        } else {
-                          keyNavigationDisabled = true;
+                            if (keyNavigationDisabled) {
+                                return;
+                            } else {
+                                keyNavigationDisabled = true;
+                            }
+
+                            overlayColor = theprev.data('overlay');
+
+                            framewidth = theprev.data('framewidth');
+                            frameheight = theprev.data('frameheight');
+                            border = theprev.data('border');
+                            bgcolor = theprev.data('bgcolor');
+
+                            dest = theprev.attr('href');
+
+                            if(theprev.attr(option.titleattr)){
+                                title = theprev.attr(option.titleattr);
+                            }else{
+                                title = '';
+                            }
+
+                            if (overlayColor === undefined ) {
+                                overlayColor = "";
+                            }
+
+
+
+                            content.animate({ opacity:0}, 500, function(){
+
+                                overlay.css('background',overlayColor);
+
+                                if (theprev.data('type') == 'iframe') {
+                                    loadIframe();
+                                } else if (theprev.data('type') == 'inline'){
+                                    loadInline();
+                                } else if (theprev.data('type') == 'ajax'){
+                                    loadAjax();
+                                } else if (theprev.data('type') == 'youtube'){
+                                    loadYoutube();
+                                } else if (theprev.data('type') == 'vimeo'){
+                                    loadVimeo();
+                                }else{
+                                    content.html('<img src="'+dest+'">');
+                                    preloadFirst();
+                                }
+                                obj = theprev;
+                                checknav();
+                                keyNavigationDisabled = false;
+                            });
+
+                        },
+
+                        next: function() {
+
+
+                            if (keyNavigationDisabled) {
+                                return;
+                            } else {
+                                keyNavigationDisabled = true;
+                            }
+
+                            overlayColor = thenext.data('overlay');
+
+                            framewidth = thenext.data('framewidth');
+                            frameheight = thenext.data('frameheight');
+                            border = thenext.data('border');
+                            bgcolor = thenext.data('bgcolor');
+
+
+                            dest = thenext.attr('href');
+
+                            if(thenext.attr(option.titleattr)){
+                                title = thenext.attr(option.titleattr);
+                            }else{
+                                title = '';
+                            }
+
+                            if (overlayColor === undefined ) {
+                                overlayColor = "";
+                            }
+
+
+
+                            content.animate({ opacity:0}, 500, function(){
+
+                                overlay.css('background',overlayColor);
+
+                                if (thenext.data('type') == 'iframe') {
+                                    loadIframe();
+                                } else if (thenext.data('type') == 'inline'){
+                                    loadInline();
+                                } else if (thenext.data('type') == 'ajax'){
+                                    loadAjax();
+                                } else if (thenext.data('type') == 'youtube'){
+                                    loadYoutube();
+                                } else if (thenext.data('type') == 'vimeo'){
+                                    loadVimeo();
+                                }else{
+                                    content.html('<img src="'+dest+'">');
+                                    preloadFirst();
+                                }
+                                obj = thenext;
+                                checknav();
+                                keyNavigationDisabled = false;
+                            });
+
                         }
-
-                        overlayColor = theprev.data('overlay');
-
-                        framewidth = theprev.data('framewidth');
-                        frameheight = theprev.data('frameheight');
-                        border = theprev.data('border');
-                        bgcolor = theprev.data('bgcolor');
-
-                        dest = theprev.attr('href');
-
-                        if(theprev.attr(option.titleattr)){
-                          title = theprev.attr(option.titleattr);
-                        }else{
-                          title = '';
-                        }
-
-                        if (overlayColor === undefined ) {
-                          overlayColor = "";
-                        }
-
-
-
-                        content.animate({ opacity:0}, 500, function(){
-                          
-                          overlay.css('background',overlayColor);
-
-                          if (theprev.data('type') == 'iframe') {
-                            loadIframe();
-                          } else if (theprev.data('type') == 'inline'){
-                            loadInline();
-                          } else if (theprev.data('type') == 'ajax'){
-                            loadAjax();
-                          } else if (theprev.data('type') == 'youtube'){
-                            loadYoutube();
-                          } else if (theprev.data('type') == 'vimeo'){
-                            loadVimeo();
-                          }else{
-                            content.html('<img src="'+dest+'">');
-                            preloadFirst();
-                          }
-                          obj = theprev;
-                          checknav();
-                          keyNavigationDisabled = false;
-                        });
-
-                      },
-
-                      next: function() {
-                        
-
-                        if (keyNavigationDisabled) {
-                          return;
-                        } else {
-                          keyNavigationDisabled = true;
-                        }
-
-                        overlayColor = thenext.data('overlay');
-
-                        framewidth = thenext.data('framewidth');
-                        frameheight = thenext.data('frameheight');
-                        border = thenext.data('border');
-                        bgcolor = thenext.data('bgcolor');
-
-
-                        dest = thenext.attr('href');
-
-                        if(thenext.attr(option.titleattr)){
-                          title = thenext.attr(option.titleattr);
-                        }else{
-                          title = '';
-                        }
-
-                        if (overlayColor === undefined ) {
-                          overlayColor = "";
-                        }
-
-
-
-                        content.animate({ opacity:0}, 500, function(){
-                          
-                          overlay.css('background',overlayColor);
-
-                          if (thenext.data('type') == 'iframe') {
-                            loadIframe();
-                          } else if (thenext.data('type') == 'inline'){
-                            loadInline();
-                          } else if (thenext.data('type') == 'ajax'){
-                            loadAjax();
-                          } else if (thenext.data('type') == 'youtube'){
-                            loadYoutube();
-                          } else if (thenext.data('type') == 'vimeo'){
-                            loadVimeo();
-                          }else{
-                            content.html('<img src="'+dest+'">');
-                            preloadFirst();
-                          }
-                          obj = thenext;
-                          checknav();
-                          keyNavigationDisabled = false;
-                        });
-
-                      }
 
                     };
 
                     /* -------- NAVIGATE WITH ARROW KEYS -------- */
                     $('body').keydown(function(e) {
 
-                      if(e.keyCode == 37 && prevok == true) { // left
-                        gallnav.prev();
-                      }
+                        if(e.keyCode == 37 && prevok == true) { // left
+                            gallnav.prev();
+                        }
 
-                      if(e.keyCode == 39 && nextok == true) { // right
-                        gallnav.next();
-                      }
+                        if(e.keyCode == 39 && nextok == true) { // right
+                            gallnav.next();
+                        }
 
                     });
 
                     /* -------- PREVGALL -------- */
                     $('.vbox-prev').click(function(){
-                      gallnav.prev();
+                        gallnav.prev();
                     });
-                    
+
                     /* -------- NEXTGALL -------- */
                     $('.vbox-next').click(function(){
-                      gallnav.next();
+                        gallnav.next();
                     });
-                    
+
                     /* -------- ESCAPE HANDLER -------- */
                     function escapeHandler(e) {
-                      if(e.keyCode === 27) {
-                        closeVbox();
-                      }
+                        if(e.keyCode === 27) {
+                            closeVbox();
+                        }
                     }
 
                     /* -------- CLOSE VBOX -------- */
 
                     function closeVbox(){
-                      
-                    $('body').unbind('keydown', escapeHandler);
- 
- 
-                      if (ie9) {
 
 
-                         overlay.animate({opacity:0}, 500, function(){
+                        $('body').unbind('keydown', escapeHandler);
 
-                           overlay.remove();
-                         $('.vwrap').children().unwrap();
-                          $(window).scrollTop(-top);
-                          keyNavigationDisabled = false;
-                          obj.focus();
-                        });
+                        if (ie9) {
 
-                      } else {
-
-                        overlay.unbind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
-                        overlay.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(e){
-
-                          // Check if transition is on the overlay - thanx @kanduvisla
-                          if( e.target != e.currentTarget ) {
-                            return;
-                          }
-
-                          overlay.remove();
-                          if (ios) {
-                            $('.vwrap').bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(){
-                              $('.vwrap').children().unwrap();
-                              $(window).scrollTop(-top);
+                            overlay.animate({opacity:0}, 500, function(){
+                                overlay.remove();
+                                $('.vwrap').children().unwrap();
+                                $(window).scrollTop(-top);
+                                keyNavigationDisabled = false;
+                                obj.focus();
                             });
-                            $('.vwrap').css('opacity', '1');
-                          }else{
-                            $('.vwrap').children().unwrap();
-                            $(window).scrollTop(-top);
-                          }
-                           keyNavigationDisabled = false;
-                           obj.focus();
-                         });
-                        overlay.css('opacity', '0');
-                      }
-                     }
-                    
+
+                        } else {
+
+                            overlay.unbind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                            overlay.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(e){
+
+                                // Check if transition is on the overlay - thanx @kanduvisla
+                                if( e.target != e.currentTarget ) {
+                                    return;
+                                }
+
+                                overlay.remove();
+                                if (ios) {
+                                    $('.vwrap').bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(){
+                                        $('.vwrap').children().unwrap();
+                                        $(window).scrollTop(-top);
+                                    });
+                                    $('.vwrap').css('opacity', '1');
+                                }else{
+                                    $('.vwrap').children().unwrap();
+                                    $(window).scrollTop(-top);
+                                }
+                                keyNavigationDisabled = false;
+                                obj.focus();
+                            });
+                            overlay.css('opacity', '0');
+                        }
+                    }
 
                     /* -------- CLOSE CLICK -------- */
                     var closeclickclass = '.vbox-close, .vbox-overlay';
@@ -410,76 +402,90 @@
                     }
 
                     $(closeclickclass).click(function(e){
-                      evitacontent = '.figlio';
-                      evitaprev = '.vbox-prev';
-                      evitanext = '.vbox-next';
-                      figliall = '.figlio *';
-                      if(!$(e.target).is(evitacontent) && !$(e.target).is(evitanext) && !$(e.target).is(evitaprev)&& !$(e.target).is(figliall)){
-                        closeVbox();
-                      }
+                        evitacontent = '.figlio';
+                        evitaprev = '.vbox-prev';
+                        evitanext = '.vbox-next';
+                        figliall = '.figlio *';
+                        if(!$(e.target).is(evitacontent) && !$(e.target).is(evitanext) && !$(e.target).is(evitaprev)&& !$(e.target).is(figliall)){
+                            closeVbox();
+                        }
                     });
                     $('body').keydown(escapeHandler);
                     return false;
-                  });
+                });
             });
         }
     });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /* -------- LOAD AJAX -------- */
     function loadAjax(){
-      $.ajax({
-      url: dest,
+        $.ajax({
+            url: dest,
 
 
-      cache: false
-      }).done(function( msg ) {
-          content.html('<div class="vbox-inline">'+ msg +'</div>');
-          updateoverlay(true);
+            cache: false
+        }).done(function( msg ) {
+            content.html('<div class="vbox-inline">'+ msg +'</div>');
+            updateoverlay(true);
 
-      }).fail(function() {
-          content.html('<div class="vbox-inline"><p>Error retrieving contents, please retry</div>');
-          updateoverlay(true);
+        }).fail(function() {
+            content.html('<div class="vbox-inline"><p>Error retrieving contents, please retry</div>');
+            updateoverlay(true);
 
-      })
+        })
     }
 
     /* -------- LOAD IFRAME -------- */
     function loadIframe(){
-      content.html('<iframe class="venoframe" src="'+dest+'"></iframe>');
-    //  $('.venoframe').load(function(){ // valid only for iFrames in same domain
-      updateoverlay();
-    //  });
+        content.html('<iframe class="venoframe" src="'+dest+'"></iframe>');
+        //  $('.venoframe').load(function(){ // valid only for iFrames in same domain
+        updateoverlay();
+        //  });
     }
 
     /* -------- LOAD VIMEO -------- */
     function loadVimeo(){
-      var pezzi = dest.split('/');
-      var videoid = pezzi[pezzi.length-1];
-      content.html('<iframe width="500" height="281" class="venoframe" webkitallowfullscreen mozallowfullscreen allowfullscreen frameborder="0" src="https://player.vimeo.com/video/'+videoid+'"></iframe>');
-      updateoverlay();
+        var pezzi = dest.split('/');
+        var videoid = pezzi[pezzi.length-1];
+        content.html('<iframe width="500" height="281" class="venoframe" webkitallowfullscreen mozallowfullscreen allowfullscreen frameborder="0" src="https://player.vimeo.com/video/'+videoid+'"></iframe>');
+        updateoverlay();
     }
 
     /* -------- LOAD YOUTUBE -------- */
     function loadYoutube(){
-      var pezzi = dest.split('/');
-      var videoid = pezzi[pezzi.length-1];
-      content.html('<iframe class="venoframe" allowfullscreen src="//www.youtube.com/embed/'+videoid+'"></iframe>');
-      updateoverlay();
+        var pezzi = dest.split('/');
+        var videoid = pezzi[pezzi.length-1];
+        content.html('<iframe class="venoframe" allowfullscreen src="//www.youtube.com/embed/'+videoid+'"></iframe>');
+        updateoverlay();
     }
 
     /* -------- LOAD INLINE -------- */
     function loadInline(){
-      content.html('<div class="vbox-inline">'+$(dest).html()+'</div>');
-      updateoverlay();
+        content.html('<div class="vbox-inline">'+$(dest).html()+'</div>');
+        updateoverlay();
     }
 
     /* -------- PRELOAD IMAGE -------- */
     function preloadFirst(){
         prima = $('.vbox-content').find('img');
         prima.one('load', function() {
-          updateoverlay();
+            updateoverlay();
         }).each(function() {
-          if(this.complete) $(this).load();
+            if(this.complete) $(this).load();
         });
     }
 
@@ -490,51 +496,51 @@
 
 
 
-      blocktitle.html(title);
-      content.find(">:first-child").addClass('figlio');
-      $('.figlio').css('width', framewidth).css('height', frameheight).css('padding', border).css('background', bgcolor);
+        blocktitle.html(title);
+        content.find(">:first-child").addClass('figlio');
+        $('.figlio').css('width', framewidth).css('height', frameheight).css('padding', border).css('background', bgcolor);
 
-      sonH = content.outerHeight();
-      finH = $(window).height();
+        sonH = content.outerHeight();
+        finH = $(window).height();
 
-      if(sonH+80 < finH){
-        margine = (finH - sonH)/2;
-        content.css('margin-top', margine);
-        content.css('margin-bottom', margine);
+        if(sonH+80 < finH){
+            margine = (finH - sonH)/2;
+            content.css('margin-top', margine);
+            content.css('margin-bottom', margine);
 
-      }else{
-        content.css('margin-top', '40px');
-        content.css('margin-bottom', '40px');
-      }
+        }else{
+            content.css('margin-top', '40px');
+            content.css('margin-bottom', '40px');
+        }
         if(typeof callback  != 'undefined' && $.isFunction(callback))
-      content.animate({
-        'opacity': '1'
-      },'slow',callback);
-      else
-      content.animate({
-        'opacity': '1'
-      },'slow');
+            content.animate({
+                'opacity': '1'
+            },'slow',callback);
+        else
+            content.animate({
+                'opacity': '1'
+            },'slow');
     }
 
     /* -------- CENTER ON RESIZE -------- */
     function updateoverlayresize(){
-      if($('.vbox-content').length){
-        sonH = content.height();
-        finH = $(window).height();
+        if($('.vbox-content').length){
+            sonH = content.height();
+            finH = $(window).height();
 
-        if(sonH+80 < finH){
-          margine = (finH - sonH)/2;
-          content.css('margin-top', margine);
-          content.css('margin-bottom', margine);
-        }else{
-          content.css('margin-top', '40px');
-          content.css('margin-bottom', '40px');
+            if(sonH+80 < finH){
+                margine = (finH - sonH)/2;
+                content.css('margin-top', margine);
+                content.css('margin-bottom', margine);
+            }else{
+                content.css('margin-top', '40px');
+                content.css('margin-bottom', '40px');
+            }
         }
-      }
     }
 
     $(window).resize(function(){
-      updateoverlayresize();
+        updateoverlayresize();
     });
 
 })(jQuery);
