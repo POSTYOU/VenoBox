@@ -396,8 +396,8 @@
                            keyNavigationDisabled = false;
                            obj.focus();
                          });
--                        overlay.css('opacity', '0');
--                      }
+                        overlay.css('opacity', '0');
+                      }
                      }
                     
 
