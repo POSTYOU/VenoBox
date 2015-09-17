@@ -16,7 +16,7 @@
 
 
 
-    var bgcolor, blocknum, blocktitle, border, core, container, content, dest, 
+    var bgcolor, blocknum, blocktitle, border, core, container, content, dest,vwrap, 
         evitacontent, evitanext, evitaprev, extraCss, figliall, framewidth, frameheight, 
         infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay, 
         prima, title, thisgall, thenext, theprev, type, 
@@ -82,14 +82,29 @@
 
 
                     extraCss = obj.data( 'css' ) || "";
-
-
+                    $('body').wrapInner('<div class="vwrap"></div>');
+                    vwrap = $('.vwrap');
 
 
                     $('body').addClass('vbox-open');
                     core = '<div class="vbox-overlay ' + extraCss + '" style="background:'+ overlayColor +'"><div class="vbox-preloader">Loading...</div><div class="vbox-container"><div class="vbox-content"></div></div><div class="vbox-title"></div><div class="vbox-num">0/0</div><div class="vbox-close">X</div><div class="vbox-next">next</div><div class="vbox-prev">prev</div></div>';
 
                     $('body').append(core);
+                    if (ios) {
+                      vwrap.css({
+                        'position': 'fixed',
+                        'top': top,
+                        'opacity': '0'
+                      }).data('top', top);
+                    } else {
+                      vwrap.css({
+                       'position': 'fixed',
+                        'top': top
+                      }).data('top', top);
+                      $(window).scrollTop(0);
+                    }
+
+
 
                     overlay = $('.vbox-overlay');
                     container = $('.vbox-container');
@@ -103,38 +118,6 @@
                     checknav();
 
                     overlay.css('min-height', $(window).outerHeight());
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                     // fade in overlay
@@ -159,24 +142,7 @@
                         content.html('<img src="'+dest+'">');
                         preloadFirst();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                      }
+            }
                     });
 
                     /* -------- CHECK NEXT / PREV -------- */
@@ -391,46 +357,49 @@
 
                     function closeVbox(){
                       
-                      $('body').removeClass('vbox-open');
-                      $('body').unbind('keydown', escapeHandler);
+                    $('body').unbind('keydown', escapeHandler);
+ 
+ 
+                      if (ie9) {
 
-
-
-                        overlay.animate({opacity:0}, 500, function(){
-                          overlay.remove();
-
-
+                         overlay.animate({opacity:0}, 500, function(){
+                         overlay.animate({opacity:0}, 500, function(){
+                           overlay.remove();
+                           overlay.remove();
+                         $('.vwrap').children().unwrap();
+                          $(window).scrollTop(-top);
                           keyNavigationDisabled = false;
                           obj.focus();
                         });
 
+                      } else {
 
+                        overlay.unbind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                        overlay.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(e){
 
+                          // Check if transition is on the overlay - thanx @kanduvisla
+                          if( e.target != e.currentTarget ) {
+                            return;
+                          }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    }
+                          overlay.remove();
+                          if (ios) {
+                            $('.vwrap').bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(){
+                              $('.vwrap').children().unwrap();
+                              $(window).scrollTop(-top);
+                            });
+                            $('.vwrap').css('opacity', '1');
+                          }else{
+                            $('.vwrap').children().unwrap();
+                            $(window).scrollTop(-top);
+                          }
+                           keyNavigationDisabled = false;
+                           obj.focus();
+                         });
+-                        overlay.css('opacity', '0');
+-                      }
+                     }
+                    
 
                     /* -------- CLOSE CLICK -------- */
                     var closeclickclass = '.vbox-close, .vbox-overlay';
@@ -453,20 +422,6 @@
             });
         }
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /* -------- LOAD AJAX -------- */
     function loadAjax(){
