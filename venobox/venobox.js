@@ -16,13 +16,15 @@
 
 
 
-    var bgcolor, blocknum, blocktitle, border, core, container, content, dest,vwrap, 
+    var bgcolor, blocknum, blocktitle, border, core, container, content, dest,vwrap, ios,
         evitacontent, evitanext, evitaprev, extraCss, figliall, framewidth, frameheight, 
         infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay, 
         prima, title, thisgall, thenext, theprev, type, 
         finH, sonH, nextok, prevok,callback;
 
     $.fn.extend({
+        
+        ios = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
         //plugin name - venobox
         venobox: function(options) {
 
