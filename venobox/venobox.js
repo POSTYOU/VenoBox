@@ -362,9 +362,9 @@
  
                       if (ie9) {
 
+
                          overlay.animate({opacity:0}, 500, function(){
-                         overlay.animate({opacity:0}, 500, function(){
-                           overlay.remove();
+
                            overlay.remove();
                          $('.vwrap').children().unwrap();
                           $(window).scrollTop(-top);
