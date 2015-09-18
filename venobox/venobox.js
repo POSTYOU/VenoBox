@@ -30,8 +30,8 @@
                 titleattr: 'title', // specific attribute to get a title (e.g. [data-title]) - thanx @mendezcode
                 numeratio: false,
                 infinigall: false,
-                overlayclose: true, // disable overlay click-close - thanx @martybalandis
-                callback: undefined
+                overlayclose: true // disable overlay click-close - thanx @martybalandis
+                ,callback: undefined
             };
 
             var option = $.extend(defaults, options);
@@ -98,30 +98,56 @@
 
                     overlay.css('min-height', $(window).outerHeight());
 
-                    // fade in overlay
-                    overlay.animate({opacity:1}, 250, function(){
+                    if (ie9) {
+                        overlay.animate({opacity:1}, 250, function(){
+                            overlay.css({
+                                'min-height': $(window).outerHeight(),
+                                height : 'auto'
+                            });
+                            if(obj.data('type') == 'iframe'){
+                                loadIframe();
+                            }else if (obj.data('type') == 'inline'){
+                                loadInline();
+                            }else if (obj.data('type') == 'ajax'){
+                                loadAjax();
+                            }else if (obj.data('type') == 'vimeo'){
+                                loadVimeo();
+                            }else if (obj.data('type') == 'youtube'){
+                                loadYoutube();
+                            } else {
+                                content.html('<img src="'+dest+'">');
+                                preloadFirst();
+                            }
+                        });
+                    } else {
+                        overlay.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function(e){
 
-                        if(obj.data('type') == 'iframe'){
+                            // Check if transition is on the overlay - thanx @kanduvisla
+                            if( e.target != e.currentTarget ) {
+                                return;
+                            }
 
-                            loadIframe();
-                        }else if (obj.data('type') == 'inline'){
-
-                            loadInline();
-                        }else if (obj.data('type') == 'ajax'){
-
-                            loadAjax();
-                        }else if (obj.data('type') == 'vimeo'){
-
-                            loadVimeo();
-                        }else if (obj.data('type') == 'youtube'){
-                            loadYoutube();
-
-                        } else {
-                            content.html('<img src="'+dest+'">');
-                            preloadFirst();
-                        }
-                    });
-
+                            overlay.css({
+                                'min-height': $(window).outerHeight(),
+                                height : 'auto'
+                            });
+                            if(obj.data('type') == 'iframe'){
+                                loadIframe();
+                            }else if (obj.data('type') == 'inline'){
+                                loadInline();
+                            }else if (obj.data('type') == 'ajax'){
+                                loadAjax();
+                            }else if (obj.data('type') == 'vimeo'){
+                                loadVimeo();
+                            }else if (obj.data('type') == 'youtube'){
+                                loadYoutube();
+                            } else {
+                                content.html('<img src="'+dest+'">');
+                                preloadFirst();
+                            }
+                        });
+                        overlay.css('opacity', '1');
+                    }
 
                     if (ios) {
                         vwrap.css({
@@ -200,11 +226,7 @@
 
                         prev: function() {
 
-                            if (keyNavigationDisabled) {
-                                return;
-                            } else {
-                                keyNavigationDisabled = true;
-                            }
+                            if (keyNavigationDisabled) return; else keyNavigationDisabled = true;
 
                             overlayColor = theprev.data('overlay');
 
@@ -253,11 +275,7 @@
 
                         next: function() {
 
-                            if (keyNavigationDisabled) {
-                                return;
-                            } else {
-                                keyNavigationDisabled = true;
-                            }
+                            if (keyNavigationDisabled) return; else keyNavigationDisabled = true;
 
                             overlayColor = thenext.data('overlay');
 
