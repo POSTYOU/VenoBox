@@ -1,195 +1,75 @@
 /* ------ venobox.css --------*/
 .vbox-overlay *, .vbox-overlay *:before, .vbox-overlay *:after{
     -webkit-backface-visibility: hidden;
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing:border-box;
-    box-sizing:border-box;
+    -webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
+body{
+    -webkit-overflow-scrolling:touch;
 }
 /* ------- overlay: change here background color and opacity ----- */
 .vbox-overlay{
-    background: #fdfdfd;
-    background: rgba(0,0,0,0.85); 
+    background: #181818;
+    background: rgba(0,0,0,0.85);
     width: 100%;
     height: auto;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    bottom: 0;
+    /*bottom: 0;*/
     z-index: 999;
+    overflow: hidden;
     opacity: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-
+    transition: opacity .25s ease-in-out;
+    -moz-transition: opacity .25s ease-in-out;
+    -webkit-transition: opacity .25s ease-in-out;
 }
-
+.relativo{
+    float: left;
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: relative;
+}
 /* ----- preloader - choose between CIRCLE, IOS, DOTS, QUADS ----- */
 
 /* circle preloader */
 .vbox-preloader{
-    position:fixed; 
-    width:32px; 
+    position:fixed;
+    width:32px;
     height:32px;
-    left:50%; 
-    top:50%; 
-    margin-left:-16px; 
+    left:50%;
+    top:50%;
+    margin-left:-16px;
     margin-top:-16px;
     background-image: url(preload-circle.png);
     text-indent: -100px;
     overflow: hidden;
     -webkit-animation: playload 1.4s steps(18) infinite;
-       -moz-animation: playload 1.4s steps(18) infinite;
-        -ms-animation: playload 1.4s steps(18) infinite;
-         -o-animation: playload 1.4s steps(18) infinite;
-            animation: playload 1.4s steps(18) infinite;
+    -moz-animation: playload 1.4s steps(18) infinite;
+    -ms-animation: playload 1.4s steps(18) infinite;
+    -o-animation: playload 1.4s steps(18) infinite;
+    animation: playload 1.4s steps(18) infinite;
 }
 @-webkit-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -576px; }
+    from { background-position:    0px; }
+    to { background-position: -576px; }
 }
 @-moz-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -576px; }
+    from { background-position:    0px; }
+    to { background-position: -576px; }
 }
 @-ms-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -576px; }
+    from { background-position:    0px; }
+    to { background-position: -576px; }
 }
 @-o-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -576px; }
+    from { background-position:    0px; }
+    to { background-position: -576px; }
 }
 @keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -576px; }
+    from { background-position:    0px; }
+    to { background-position: -576px; }
 }
 
-
-/* IOS preloader */
-
-/*.vbox-preloader{
-    position:fixed; 
-    width:32px; 
-    height:32px;
-    left:50%; 
-    top:50%; 
-    margin-left:-16px; 
-    margin-top:-16px;
-    background-image: url(preload-ios.png);
-    text-indent: -100px;
-    overflow: hidden;
-    -webkit-animation: playload 1.4s steps(12) infinite;
-       -moz-animation: playload 1.4s steps(12) infinite;
-        -ms-animation: playload 1.4s steps(12) infinite;
-         -o-animation: playload 1.4s steps(12) infinite;
-            animation: playload 1.4s steps(12) infinite;
-}
-
-@-webkit-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@-moz-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@-ms-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@-o-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-*/
-
-
-/* dots preloader */
-/*
-.vbox-preloader{
-    position:fixed; 
-    width:32px; 
-    height:11px;
-    left:50%; 
-    top:50%; 
-    margin-left:-16px; 
-    margin-top:-16px;
-    background-image: url(preload-dots.png);
-    text-indent: -100px;
-    overflow: hidden;
-    -webkit-animation: playload 1.4s steps(24) infinite;
-       -moz-animation: playload 1.4s steps(24) infinite;
-        -ms-animation: playload 1.4s steps(24) infinite;
-         -o-animation: playload 1.4s steps(24) infinite;
-            animation: playload 1.4s steps(24) infinite;
-}
-
-@-webkit-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -768px; }
-}
-@-moz-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -768px; }
-}
-@-ms-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -768px; }
-}
-@-o-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -768px; }
-}
-@keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -768px; }
-}
-*/
-
-
-/* quads preloader */
-/*
-.vbox-preloader{
-    position:fixed; 
-    width:32px; 
-    height:10px;
-    left:50%; 
-    top:50%; 
-    margin-left:-16px; 
-    margin-top:-16px;
-    background-image: url(preload-quads.png);
-    text-indent: -100px;
-    overflow: hidden;
-    -webkit-animation: playload 1.4s steps(12) infinite;
-       -moz-animation: playload 1.4s steps(12) infinite;
-        -ms-animation: playload 1.4s steps(12) infinite;
-         -o-animation: playload 1.4s steps(12) infinite;
-            animation: playload 1.4s steps(12) infinite;
-}
-@-webkit-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@-moz-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@-ms-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@-o-keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-@keyframes playload {
-   from { background-position:    0px; }
-     to { background-position: -384px; }
-}
-*/
 /* ----- navigation ----- */
 .vbox-close{
     cursor: pointer;
@@ -325,7 +205,7 @@
     max-width: 100%;
     height: auto;
 }
-vwrap{
+.vwrap{
     opacity: 1;
     transition: opacity .25s ease-in-out;
     -moz-transition: opacity .25s ease-in-out;
@@ -339,4 +219,4 @@ vwrap{
     left: 0;
     overflow: hidden;
     z-index: 1;
- } 
+}
