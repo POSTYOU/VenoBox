@@ -10,3 +10,23 @@ The big difference compared to many others plugins like this is that VenoBox cal
 view demo at: http://lab.veno.it/venobox/
 
 License: released under the MIT License
+
+Installation over Composer:
+
+usage:
+
+"require": {
+
+        "nicolafranchini/venobox": "dev-master"
+},
+
+
+"repositories": [
+
+        {
+        
+            "type": "vcs",
+            "url": "https://github.com/garyee/VenoBox"
+        }
+        
+],
