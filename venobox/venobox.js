@@ -11,11 +11,12 @@
  */
 (function($){
 
-    var ios,ie9,bgcolor, blocknum, blocktitle, border, core, container, content, dest,
+    var autoplay,ios,ie9, bgcolor, blocknum, blocktitle, border, core, container, content,trigger,dest,
         evitacontent, evitanext, evitaprev, extraCss, figliall, framewidth, frameheight,
-        infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay,top,
+        infinigall, items, keyNavigationDisabled, margine, numeratio, overlayColor, overlay, top,
         prima, title, thisgall, thenext, theprev, type,
-        finH, sonH, nextok, prevok,callback;
+        finH, sonH, nextok, prevok,
+        pre_open_callback,post_open_callback,pre_close_callback,post_close_callback,post_resize_callback;
 
     $.fn.extend({
         //plugin name - venobox
@@ -30,8 +31,12 @@
                 titleattr: 'title', // specific attribute to get a title (e.g. [data-title]) - thanx @mendezcode
                 numeratio: false,
                 infinigall: false,
-                overlayclose: true // disable overlay click-close - thanx @martybalandis
-                ,callback: undefined
+                overlayclose: true, // disable overlay click-close - thanx @martybalandis 
+                pre_open_callback: undefined,
+                post_open_callback: undefined,
+                pre_close_callback: undefined,
+                post_close_callback: undefined,
+                post_resize_callback: undefined
             };
 
             var option = $.extend(defaults, options);
@@ -52,31 +57,48 @@
                 obj.data('numeratio', option.numeratio);
                 obj.data('infinigall', option.infinigall);
                 obj.data('overlayclose', option.overlayclose);
-                obj.data('callback', option.callback);
+                obj.data('pre_open_callback', option.pre_open_callback);
+                obj.data('post_open_callback', option.post_open_callback);
+                obj.data('pre_close_callback', option.pre_close_callback);
+                obj.data('post_close_callback', option.post_close_callback);
+                obj.data('post_resize_callback', option.post_resize_callback);
                 obj.data('venobox', true);
 
                 ios = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
-
-                // IE 9 or less
-                ie9 = ((document.all && !window.atob) ? true : false);
+                ie9 = ((document.all && !window.atob) ? true : false); // IE 9 or less
 
                 obj.click(function(e){
                     e.stopPropagation();
                     e.preventDefault();
+
+                    pre_open_callback = obj.data('pre_open_callback');
+                    if(typeof pre_open_callback  != 'undefined' && $.isFunction(pre_open_callback)){
+                        var rtn=pre_open_callback($(obj));
+                        if(rtn!=undefined && !rtn)
+                            return;
+                    }
                     obj = $(this);
                     overlayColor = obj.data('overlay');
                     framewidth = obj.data('framewidth');
                     frameheight = obj.data('frameheight');
+                    // set data-autoplay="true" for vimeo and youtube videos - thanx @zehfernandes
+                    autoplay = obj.data('autoplay') || false;
                     border = obj.data('border');
-                    callback = obj.data('callback');
                     bgcolor = obj.data('bgcolor');
                     nextok = false;
                     prevok = false;
                     keyNavigationDisabled = false;
+                    post_open_callback = obj.data('post_open_callback');
+                    pre_close_callback = obj.data('pre_close_callback');
+                    post_close_callback = obj.data('post_close_callback');
+                    post_resize_callback = obj.data('post_resize_callback');
+
+
                     dest = obj.attr('href');
+                    extraCss = obj.data( 'css' ) || "";
                     top = $(window).scrollTop();
                     top = -top;
-                    extraCss = obj.data( 'css' ) || "";
+
 
                     $('body').wrapInner('<div class="vwrap"></div>');
 
@@ -90,6 +112,7 @@
                     content = $('.vbox-content');
                     blocknum = $('.vbox-num');
                     blocktitle = $('.vbox-title');
+                    trigger =$(obj);
 
                     content.html('');
                     content.css('opacity', '0');
@@ -99,6 +122,8 @@
                     overlay.css('min-height', $(window).outerHeight());
 
                     if (ie9) {
+
+                        // fade in overlay
                         overlay.animate({opacity:1}, 250, function(){
                             overlay.css({
                                 'min-height': $(window).outerHeight(),
@@ -111,9 +136,9 @@
                             }else if (obj.data('type') == 'ajax'){
                                 loadAjax();
                             }else if (obj.data('type') == 'vimeo'){
-                                loadVimeo();
+                                loadVimeo(autoplay);
                             }else if (obj.data('type') == 'youtube'){
-                                loadYoutube();
+                                loadYoutube(autoplay);
                             } else {
                                 content.html('<img src="'+dest+'">');
                                 preloadFirst();
@@ -138,9 +163,9 @@
                             }else if (obj.data('type') == 'ajax'){
                                 loadAjax();
                             }else if (obj.data('type') == 'vimeo'){
-                                loadVimeo();
+                                loadVimeo(autoplay);
                             }else if (obj.data('type') == 'youtube'){
-                                loadYoutube();
+                                loadYoutube(autoplay);
                             } else {
                                 content.html('<img src="'+dest+'">');
                                 preloadFirst();
@@ -172,7 +197,7 @@
 
                         items = $('.vbox-item[data-gall="' + thisgall + '"]');
 
-                        if(items.length > 0 && numeratio === true){
+                        if(items.length > 1 && numeratio === true){
                             blocknum.html(items.index(obj)+1 + ' / ' + items.length);
                             blocknum.show();
                         }else{
@@ -190,7 +215,7 @@
                             blocktitle.hide();
                         }
 
-                        if (items.length > 0 && infinigall === true) {
+                        if (items.length > 1 && infinigall === true) {
 
                             nextok = true;
                             prevok = true;
@@ -204,17 +229,17 @@
 
                         } else {
 
-                            if(thenext.length > 0 ){
+                            if (thenext.length > 0) {
                                 $('.vbox-next').css('display', 'block');
                                 nextok = true;
-                            }else{
+                            } else {
                                 $('.vbox-next').css('display', 'none');
                                 nextok = false;
                             }
-                            if(items.index(obj) > 0 ){
+                            if (items.index(obj) > 0) {
                                 $('.vbox-prev').css('display', 'block');
                                 prevok = true;
-                            }else{
+                            } else {
                                 $('.vbox-prev').css('display', 'none');
                                 prevok = false;
                             }
@@ -226,7 +251,11 @@
 
                         prev: function() {
 
-                            if (keyNavigationDisabled) return; else keyNavigationDisabled = true;
+                            if (keyNavigationDisabled) {
+                                return;
+                            } else {
+                                keyNavigationDisabled = true;
+                            }
 
                             overlayColor = theprev.data('overlay');
 
@@ -234,8 +263,9 @@
                             frameheight = theprev.data('frameheight');
                             border = theprev.data('border');
                             bgcolor = theprev.data('bgcolor');
-
                             dest = theprev.attr('href');
+
+                            autoplay = theprev.data('autoplay');
 
                             if(theprev.attr(option.titleattr)){
                                 title = theprev.attr(option.titleattr);
@@ -247,9 +277,8 @@
                                 overlayColor = "";
                             }
 
-
-
                             content.animate({ opacity:0}, 500, function(){
+
                                 overlay.css('background',overlayColor);
 
                                 if (theprev.data('type') == 'iframe') {
@@ -259,9 +288,9 @@
                                 } else if (theprev.data('type') == 'ajax'){
                                     loadAjax();
                                 } else if (theprev.data('type') == 'youtube'){
-                                    loadYoutube();
+                                    loadYoutube(autoplay);
                                 } else if (theprev.data('type') == 'vimeo'){
-                                    loadVimeo();
+                                    loadVimeo(autoplay);
                                 }else{
                                     content.html('<img src="'+dest+'">');
                                     preloadFirst();
@@ -275,7 +304,11 @@
 
                         next: function() {
 
-                            if (keyNavigationDisabled) return; else keyNavigationDisabled = true;
+                            if (keyNavigationDisabled) {
+                                return;
+                            } else {
+                                keyNavigationDisabled = true;
+                            }
 
                             overlayColor = thenext.data('overlay');
 
@@ -283,9 +316,8 @@
                             frameheight = thenext.data('frameheight');
                             border = thenext.data('border');
                             bgcolor = thenext.data('bgcolor');
-
-
                             dest = thenext.attr('href');
+                            autoplay = thenext.data('autoplay');
 
                             if(thenext.attr(option.titleattr)){
                                 title = thenext.attr(option.titleattr);
@@ -297,9 +329,8 @@
                                 overlayColor = "";
                             }
 
-
-
                             content.animate({ opacity:0}, 500, function(){
+
                                 overlay.css('background',overlayColor);
 
                                 if (thenext.data('type') == 'iframe') {
@@ -309,9 +340,9 @@
                                 } else if (thenext.data('type') == 'ajax'){
                                     loadAjax();
                                 } else if (thenext.data('type') == 'youtube'){
-                                    loadYoutube();
+                                    loadYoutube(autoplay);
                                 } else if (thenext.data('type') == 'vimeo'){
-                                    loadVimeo();
+                                    loadVimeo(autoplay);
                                 }else{
                                     content.html('<img src="'+dest+'">');
                                     preloadFirst();
@@ -358,6 +389,13 @@
                     /* -------- CLOSE VBOX -------- */
 
                     function closeVbox(){
+                        if(typeof pre_close_callback  != 'undefined' && $.isFunction(pre_close_callback)){
+                            var rtn=pre_close_callback(trigger,overlay,container,content,blocknum,blocktitle);
+                            if(rtn!=undefined && !rtn){
+                                return;
+                            }
+                        }
+
 
                         $('body').unbind('keydown', escapeHandler);
 
@@ -395,12 +433,19 @@
                                 keyNavigationDisabled = false;
                                 obj.focus();
                             });
-                            overlay.css('opacity', '0');
+                            if(typeof post_close_callback  != 'undefined' && $.isFunction(post_close_callback))
+                                overlay.animate({
+                                    'opacity': '0'
+                                },'slow',post_close_callback(trigger,overlay,container,content,blocknum,blocktitle));
+                            else
+                                overlay.animate({
+                                    'opacity': '0'
+                                },'slow');
                         }
                     }
 
                     /* -------- CLOSE CLICK -------- */
-                    var closeclickclass = '.vbox-close, .vbox-overlay';
+                    var closeclickclass = '.vbox-overlay';
                     if(!obj.data('overlayclose')){
                         closeclickclass = '.vbox-close';    // close only on X
                     }
@@ -425,8 +470,6 @@
     function loadAjax(){
         $.ajax({
             url: dest,
-
-
             cache: false
         }).done(function( msg ) {
             content.html('<div class="vbox-inline">'+ msg +'</div>');
@@ -447,18 +490,20 @@
     }
 
     /* -------- LOAD VIMEO -------- */
-    function loadVimeo(){
+    function loadVimeo(autoplay){
         var pezzi = dest.split('/');
         var videoid = pezzi[pezzi.length-1];
-        content.html('<iframe width="500" height="281" class="venoframe" webkitallowfullscreen mozallowfullscreen allowfullscreen frameborder="0" src="https://player.vimeo.com/video/'+videoid+'"></iframe>');
+        var stringAutoplay = autoplay ? "?autoplay=1" : "";
+        content.html('<iframe class="venoframe" webkitallowfullscreen mozallowfullscreen allowfullscreen frameborder="0" src="//player.vimeo.com/video/'+videoid+stringAutoplay+'"></iframe>');
         updateoverlay();
     }
 
     /* -------- LOAD YOUTUBE -------- */
-    function loadYoutube(){
+    function loadYoutube(autoplay){
         var pezzi = dest.split('/');
         var videoid = pezzi[pezzi.length-1];
-        content.html('<iframe class="venoframe" allowfullscreen src="//www.youtube.com/embed/'+videoid+'"></iframe>');
+        var stringAutoplay = autoplay ? "?autoplay=1" : "";
+        content.html('<iframe class="venoframe" webkitallowfullscreen mozallowfullscreen allowfullscreen src="//www.youtube.com/embed/'+videoid+stringAutoplay+'"></iframe>');
         updateoverlay();
     }
 
@@ -480,6 +525,7 @@
 
     /* -------- CENTER ON LOAD -------- */
     function updateoverlay(notopzero){
+
         notopzero = notopzero || false;
         if (notopzero != true) {
             $(window).scrollTop(0);
@@ -488,7 +534,6 @@
         blocktitle.html(title);
         content.find(">:first-child").addClass('figlio');
         $('.figlio').css('width', framewidth).css('height', frameheight).css('padding', border).css('background', bgcolor);
-
         sonH = content.outerHeight();
         finH = $(window).height();
 
@@ -501,10 +546,11 @@
             content.css('margin-top', '40px');
             content.css('margin-bottom', '40px');
         }
-        if(typeof callback  != 'undefined' && $.isFunction(callback))
+
+        if(typeof post_open_callback  != 'undefined' && $.isFunction(post_open_callback))
             content.animate({
                 'opacity': '1'
-            },'slow',callback);
+            },'slow',post_open_callback(trigger,overlay,container,content,blocknum,blocktitle));
         else
             content.animate({
                 'opacity': '1'
@@ -513,15 +559,17 @@
 
     /* -------- CENTER ON RESIZE -------- */
     function updateoverlayresize(){
-        if($('.vbox-content').length){
+        if($('.vbox-content').length) {
+            if (typeof post_resize_callback != 'undefined' && $.isFunction(post_resize_callback))
+                post_resize_callback(trigger,overlay,container,content,blocknum,blocktitle);
             sonH = content.height();
             finH = $(window).height();
 
-            if(sonH+80 < finH){
-                margine = (finH - sonH)/2;
+            if (sonH + 80 < finH) {
+                margine = (finH - sonH) / 2;
                 content.css('margin-top', margine);
                 content.css('margin-bottom', margine);
-            }else{
+            } else {
                 content.css('margin-top', '40px');
                 content.css('margin-bottom', '40px');
             }
