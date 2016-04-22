@@ -482,6 +482,8 @@
                         count++;
                         if(count==len)
                             updateoverlay(true);
+                    }).each(function() {
+                        if(this.complete) $(this).load();
                     });
                 });
             else
