@@ -544,10 +544,11 @@
         if (notopzero != true) {
             $(window).scrollTop(0);
         }
-
         blocktitle.html(title);
-        content.find(">:first-child").addClass('figlio');
-        $('.figlio').css('width', framewidth).css('height', frameheight).css('padding', border).css('background', bgcolor);
+        var child=content.find(">:first-child");
+        if(frameheight=='' && !child.hasClass('venoframe'))
+            frameheight="auto";
+        child.addClass('figlio').css('width', framewidth).css('height', frameheight).css('padding', border).css('background', bgcolor);
         sonH = content.outerHeight();
         finH = $(window).height();
 
